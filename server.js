@@ -7,39 +7,35 @@ const mongoose = require('mongoose');
 const app = express();
 
 const allowedOrigins = [
-  'https://multivion.onrender.com', // Your production frontend
-  'http://127.0.0.1:5500',         // Live Server default
-  'http://localhost:5500'          // Alternative localhost
+  'https://multivion.onrender.com',
+  'http://127.0.0.1:5500',
+  'http://localhost:5500'
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
+  origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
+    console.log('Blocked by CORS:', origin);
     return callback(new Error('Not allowed by CORS'));
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'OPTIONS'],
   credentials: true
 }));
 
-// Handle preflight requests
-app.options('*', cors());
-
-app.use(express.urlencoded({ extended: true }));
+// Middleware
 app.use(express.json());
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000
+  serverSelectionTimeoutMS: 5000 // Timeout after 5s instead of 30s
 })
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => {
   console.error('MongoDB connection error:', err);
-  process.exit(1);
+  process.exit(1); // Exit process if can't connect
 });
 
 // Routes
