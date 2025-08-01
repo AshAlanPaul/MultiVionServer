@@ -6,20 +6,22 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
+// CORS configuration - only need this one
+app.use(cors({
+  origin: "https://multivion.onrender.com" 
+}));
 
-// Middleware
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000 // Timeout after 5s instead of 30s
+  serverSelectionTimeoutMS: 5000
 })
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => {
   console.error('MongoDB connection error:', err);
-  process.exit(1); // Exit process if can't connect
+  process.exit(1);
 });
 
 // Routes
