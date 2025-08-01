@@ -22,7 +22,7 @@ app.use(cors({
     if (allowedOrigins.some(allowedOrigin => 
       origin.startsWith(allowedOrigin) || 
       origin.includes(allowedOrigin)
-    ) {
+    )) {
       return callback(null, true);
     }
     
