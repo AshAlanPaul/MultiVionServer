@@ -6,9 +6,21 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-// CORS configuration - only need this one
+const allowedOrigins = [
+  "https://multivion.onrender.com", // Your production frontend
+  "http://127.0.0.1:5500",         // Your local development
+  "http://localhost:5500"          // Alternative localhost
+];
+
 app.use(cors({
-  origin: "https://multivion.onrender.com" 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
 
 app.use(express.urlencoded({ extended: true }));
