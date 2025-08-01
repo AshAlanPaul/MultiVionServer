@@ -7,21 +7,27 @@ const mongoose = require('mongoose');
 const app = express();
 
 const allowedOrigins = [
-  "https://multivion.onrender.com", // Your production frontend
-  "http://127.0.0.1:5500",         // Your local development
-  "http://localhost:5500"          // Alternative localhost
+  'https://multivion.onrender.com', // Your production frontend
+  'http://127.0.0.1:5500',         // Live Server default
+  'http://localhost:5500'          // Alternative localhost
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
+    return callback(new Error('Not allowed by CORS'));
   },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
