@@ -7,35 +7,26 @@ const mongoose = require('mongoose');
 const app = express();
 
 const allowedOrigins = [
-  'https://multivion.onrender.com',  // Your production frontend
-  'http://127.0.0.1:5500',          // VS Code Live Server
-  'http://localhost:5500',          // Local development
-  'https://multivion-frontend.onrender.com' // Your frontend if different
+  'https://multivion.onrender.com', // Your production frontend
+  'http://127.0.0.1:5500',         // Live Server default
+  'http://localhost:5500'          // Alternative localhost
 ];
 
-// Enhanced CORS configuration
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or Postman)
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.some(allowedOrigin => 
-      origin.startsWith(allowedOrigin) || 
-      origin.includes(allowedOrigin)
-    )) {
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    
-    console.log('Blocked by CORS:', origin);
     return callback(new Error('Not allowed by CORS'));
   },
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  maxAge: 86400 // 24 hours
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
-// Explicitly handle OPTIONS requests
+// Handle preflight requests
 app.options('*', cors());
 
 app.use(express.urlencoded({ extended: true }));
