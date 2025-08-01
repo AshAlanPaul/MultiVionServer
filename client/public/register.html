@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - Multivion</title>
+  <link rel="stylesheet" href="../../client/assets/css/registersty.css" />
+</head>
+<body>
+  <div class="auth-container">
+    <h2>Create Account</h2>
+    <form id="registerForm">
+      <input type="text" name="username" placeholder="Username" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="login.html">Login</a></p>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      try {
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        // Check content type of response
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.message || 'Registration failed');
+          }
+          alert(result.message || 'Check your email to verify your account.');
+          window.location.href = '/login.html'; // Redirect after successful registration
+        } else {
+          // Handle HTML response (like our error pages)
+          const html = await response.text();
+          document.body.insertAdjacentHTML('beforeend', html);
+        }
+      } catch (error) {
+        alert(error.message || 'An error occurred during registration');
+        console.error('Registration error:', error);
+      }
+    });
+  </script>
+</body>
+</html>
